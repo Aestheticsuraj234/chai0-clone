@@ -1,4 +1,4 @@
-import { onboardUser } from "@/lib/actions/onboard-user";
+import { onboardUser } from "@/features/auth/actions";
 
 export default async function RootGroupLayout({
   children,

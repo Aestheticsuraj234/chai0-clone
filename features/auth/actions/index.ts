@@ -38,3 +38,32 @@ export async function onboardUser() {
     },
   });
 }
+
+export const getCurrentUser = async () => {
+    try {
+      const user = await currentUser();
+  
+      if (!user) {
+        return null;
+      }
+  
+      const dbUser = await prisma.user.findUnique({
+        where: {
+          clerkId: user.id,
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          imageUrl: true,
+          clerkId: true,
+        },
+      });
+  
+      return dbUser;
+    } catch (error) {
+      console.error("❌ Error fetching current user:", error);
+      return null;
+    }
+  };
+  
