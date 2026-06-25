@@ -1,15 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import {
-  IconArrowUp,
-  IconChartLine,
-  IconChevronDown,
-  IconDeviceGamepad2,
-  IconMail,
-  IconPhoto,
-  IconRefresh,
-} from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
+import { IconArrowUp, IconChevronDown, IconRefresh } from "@tabler/icons-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
@@ -18,38 +12,30 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-
-const suggestions = [
-  {
-    label: "Contact Form",
-    icon: IconMail,
-    prompt: "Build a contact form with validation and success states",
-  },
-  {
-    label: "Image Editor",
-    icon: IconPhoto,
-    prompt: "Build a simple image editor with crop and filter controls",
-  },
-  {
-    label: "Mini Game",
-    icon: IconDeviceGamepad2,
-    prompt: "Build a mini browser game with score tracking",
-  },
-  {
-    label: "Finance Calculator",
-    icon: IconChartLine,
-    prompt: "Build a finance calculator with charts and projections",
-  },
-] as const;
+import { Spinner } from "@/components/ui/spinner";
+import { useCreateProject } from "@/features/projects/hooks/projects";
+import {
+  getRandomPromptTemplate,
+  promptTemplateCategories,
+} from "@/components/home/prompt-templates";
 
 export function PromptInput() {
   const [prompt, setPrompt] = useState("");
+  const router = useRouter();
+  const { mutate: createProject, isPending } = useCreateProject();
 
   function handleSubmit() {
     const trimmed = prompt.trim();
-    if (!trimmed) return;
-    // TODO: wire up generation flow
-    console.log(trimmed);
+    if (!trimmed || isPending) return;
+
+    createProject(trimmed, {
+      onSuccess: (project) => {
+        router.push(`/projects/${project.id}`);
+      },
+      onError: (error) => {
+        toast.error(error.message || "Failed to create project");
+      },
+    });
   }
 
   function applySuggestion(nextPrompt: string) {
@@ -57,7 +43,7 @@ export function PromptInput() {
   }
 
   function shuffleSuggestions() {
-    setPrompt(suggestions[Math.floor(Math.random() * suggestions.length)].prompt);
+    setPrompt(getRandomPromptTemplate().prompt);
   }
 
   return (
@@ -68,6 +54,7 @@ export function PromptInput() {
           onChange={(event) => setPrompt(event.target.value)}
           placeholder="Ask chai0 to build..."
           rows={4}
+          disabled={isPending}
           className="min-h-24 px-4 pt-4 text-sm"
           onKeyDown={(event) => {
             if (event.key === "Enter" && !event.shiftKey) {
@@ -88,38 +75,52 @@ export function PromptInput() {
             size="icon-sm"
             variant="default"
             onClick={handleSubmit}
-            disabled={!prompt.trim()}
+            disabled={!prompt.trim() || isPending}
             aria-label="Submit prompt"
           >
-            <IconArrowUp />
+            {isPending ? <Spinner className="size-4" /> : <IconArrowUp />}
           </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>
 
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        {suggestions.map(({ label, icon: Icon, prompt: suggestionPrompt }) => (
-          <Button
-            key={label}
-            type="button"
-            variant="outline"
-            size="sm"
-            className="rounded-full"
-            onClick={() => applySuggestion(suggestionPrompt)}
-          >
-            <Icon />
-            {label}
-          </Button>
+      <div className="flex w-full flex-col gap-5 text-left">
+        {promptTemplateCategories.map((category) => (
+          <div key={category.name} className="flex flex-col gap-2">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {category.name}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {category.templates.map(({ label, icon: Icon, prompt: templatePrompt }) => (
+                <Button
+                  key={label}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  disabled={isPending}
+                  onClick={() => applySuggestion(templatePrompt)}
+                >
+                  <Icon />
+                  {label}
+                </Button>
+              ))}
+            </div>
+          </div>
         ))}
-        <Button
-          type="button"
-          variant="outline"
-          size="icon-sm"
-          className="rounded-full"
-          onClick={shuffleSuggestions}
-          aria-label="Shuffle suggestions"
-        >
-          <IconRefresh />
-        </Button>
+
+        <div className="flex justify-center pt-1">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="rounded-full text-muted-foreground"
+            disabled={isPending}
+            onClick={shuffleSuggestions}
+          >
+            <IconRefresh />
+            Random idea
+          </Button>
+        </div>
       </div>
     </div>
   );
