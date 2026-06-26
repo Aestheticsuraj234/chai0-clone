@@ -1,67 +1,109 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { GlassNavbar } from "@/components/home/glass-navbar";
-import { HomeBackground } from "@/components/home/home-background";
-import { Spinner } from "@/components/ui/spinner";
-import { useGetProjectById } from "@/features/projects/hooks/projects";
+import { Code, CrownIcon, EyeIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { ProjectFragment } from "@/features/projects/fragment-types";
+import FragmentWeb from "./fragment-web";
+import { FileExplorer } from "./file-explorer";
+import MessageContainer from "./message-container";
+import ProjectHeader from "./project-header";
 
-export function ProjectView({ id }: { id: string }) {
-  const { data: project, isLoading, isError, error } = useGetProjectById(id);
+export function ProjectView({ projectId }: { projectId: string }) {
+  const [activeFragment, setActiveFragment] = useState<ProjectFragment | null>(
+    null
+  );
+  const [tabState, setTabState] = useState<"preview" | "code">("preview");
 
   return (
-    <div className="relative flex min-h-full flex-1 flex-col overflow-hidden">
-      <HomeBackground />
-      <GlassNavbar />
-      <main className="flex flex-1 flex-col px-4 pb-16 pt-28">
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-          {isLoading ? (
-            <div className="flex justify-center py-24">
-              <Spinner className="size-6 text-muted-foreground" />
-            </div>
-          ) : isError || !project ? (
-            <div className="rounded-2xl border border-border/60 bg-card/50 p-8 text-center shadow-sm backdrop-blur-sm">
-              <p className="text-sm text-muted-foreground">
-                {error instanceof Error ? error.message : "Project not found"}
-              </p>
-              <Link
-                href="/"
-                className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
-              >
-                Back to home
-              </Link>
-            </div>
-          ) : (
-            <>
-              <div className="flex flex-col gap-1">
-                <Link
-                  href="/"
-                  className="text-sm text-muted-foreground hover:text-foreground"
-                >
-                  ← New project
-                </Link>
-                <h1 className="text-2xl font-semibold tracking-tight">
-                  {project.name}
-                </h1>
-              </div>
+    <div className="h-screen">
+      <ResizablePanelGroup orientation="horizontal">
+        <ResizablePanel
+          defaultSize={28}
+          minSize={20}
+          className="flex min-h-0 flex-col"
+        >
+          <ProjectHeader projectId={projectId} />
+          <MessageContainer
+            projectId={projectId}
+            activeFragment={activeFragment}
+            setActiveFragment={setActiveFragment}
+          />
+        </ResizablePanel>
 
-              <div className="flex flex-col gap-4">
-                {project.messages.map((message) => (
-                  <article
-                    key={message.id}
-                    className="rounded-2xl border border-border/60 bg-card/50 p-4 shadow-sm backdrop-blur-sm"
-                  >
-                    <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      {message.role.toLowerCase()}
-                    </p>
-                    <p className="whitespace-pre-wrap text-sm">{message.content}</p>
-                  </article>
-                ))}
+        <ResizableHandle withHandle />
+
+        <ResizablePanel defaultSize={72} minSize={45} className="min-w-0">
+          <Tabs
+            className="flex h-full flex-col"
+            defaultValue="preview"
+            value={tabState}
+            onValueChange={(value) => setTabState(value as "preview" | "code")}
+          >
+            <div className="flex w-full items-center gap-x-2 border-b p-2">
+              <TabsList className="h-8 rounded-md border p-0">
+                <TabsTrigger
+                  value="preview"
+                  className="flex items-center gap-x-2 rounded-md px-3"
+                >
+                  <EyeIcon className="size-4" />
+                  <span>Demo</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="code"
+                  className="flex items-center gap-x-2 rounded-md px-3"
+                >
+                  <Code className="size-4" />
+                  <span>Code</span>
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="ml-auto flex items-center gap-x-2">
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/">
+                    <CrownIcon className="mr-2 size-4" />
+                    Upgrade
+                  </Link>
+                </Button>
               </div>
-            </>
-          )}
-        </div>
-      </main>
+            </div>
+
+            <TabsContent
+              value="preview"
+              className="mt-0 min-h-0 flex-1 overflow-hidden data-[state=inactive]:hidden"
+            >
+              {activeFragment ? (
+                <FragmentWeb data={activeFragment} />
+              ) : (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  Select a fragment to preview
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent
+              value="code"
+              className="mt-0 min-h-0 flex-1 overflow-hidden data-[state=inactive]:hidden"
+            >
+              {activeFragment?.files &&
+              Object.keys(activeFragment.files).length > 0 ? (
+                <FileExplorer files={activeFragment.files} />
+              ) : (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  Select a fragment to view code
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 }

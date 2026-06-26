@@ -1,6 +1,6 @@
 "use server";
-import { Prisma } from "@/lib/generated/prisma/client";
 import { getCurrentUser } from "@/features/auth/actions";
+import { inngest } from "@/features/inngest/client";
 import { MessageRole, MessageType } from "@/lib/generated/prisma/client";
 import { generateSlug } from "random-word-slugs";
 import { prisma } from "@/lib/db";
@@ -16,8 +16,6 @@ export const createProject = async (value: string) => {
     }
 
     try {
-        // TODO: add rate limiting
-
         const project = await prisma.project.create({
             data: {
                 name: generateSlug(2, { format: "kebab" }),
@@ -32,7 +30,13 @@ export const createProject = async (value: string) => {
             }
         });
 
-        //TODO: inngest background job trigger
+        await inngest.send({
+            name: "code-agent/run",
+            data: {
+                value,
+                projectId: project.id,
+            },
+        });
 
         return project;
     } catch (error) {
