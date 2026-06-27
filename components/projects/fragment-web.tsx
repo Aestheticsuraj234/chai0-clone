@@ -6,14 +6,28 @@ import { Button } from "@/components/ui/button";
 import { Hint } from "@/components/ui/hint";
 import type { ProjectFragment } from "@/features/projects/fragment-types";
 
+/**
+ * Live preview of a generated fragment running in its E2B sandbox.
+ *
+ * Embeds the sandbox URL in a sandboxed `<iframe>` and provides controls to
+ * refresh the preview, copy the URL, and open it in a new tab.
+ *
+ * @param data - The fragment to preview (provides `sandboxUrl` and `title`).
+ */
 export default function FragmentWeb({ data }: { data: ProjectFragment }) {
   const [fragmentKey, setFragmentKey] = useState(0);
   const [copied, setCopied] = useState(false);
 
+  /**
+   * Force the preview iframe to reload by changing its `key`.
+   */
   function onRefresh() {
     setFragmentKey((prev) => prev + 1);
   }
 
+  /**
+   * Copy the sandbox URL to the clipboard and briefly show a "Copied" state.
+   */
   function onCopy() {
     navigator.clipboard.writeText(data.sandboxUrl);
     setCopied(true);

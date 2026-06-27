@@ -6,6 +6,15 @@ import { generateSlug } from "random-word-slugs";
 import { prisma } from "@/lib/db";
 
 
+/**
+ * Create a new project from an initial prompt and start an agent run.
+ *
+ * Generates a random kebab-case project name, stores the prompt as the first
+ * user message, and emits a `code-agent/run` event to build the app.
+ *
+ * @param value - The user's initial prompt describing what to build.
+ * @returns The created project, or an `{ error }` object on failure/unauthorized.
+ */
 export const createProject = async (value: string) => {
     const user = await getCurrentUser();
 
@@ -47,6 +56,11 @@ export const createProject = async (value: string) => {
     }
 }
 
+/**
+ * List the signed-in user's projects, newest first.
+ *
+ * @returns The user's projects, or an `{ error }` object on failure/unauthorized.
+ */
 export const getProjects = async () => {
     const user = await getCurrentUser();
 
@@ -75,6 +89,13 @@ export const getProjects = async () => {
     }
 }
 
+/**
+ * Fetch a single project owned by the signed-in user, including its messages.
+ *
+ * @param id - The project id to look up.
+ * @returns The project with its messages, or an `{ error }` object when not
+ *   found, unauthorized, or on failure.
+ */
 export const getProjectById = async (id: string) => {
     const user = await getCurrentUser();
 

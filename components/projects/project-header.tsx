@@ -21,10 +21,24 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { useGetProjectById } from "@/features/projects/hooks/projects";
 
+/**
+ * Turn a kebab-case project slug into a human-friendly, spaced name.
+ *
+ * @param name - The raw project name (e.g. `"sunny-otter"`).
+ * @returns The same name with hyphens replaced by spaces.
+ */
 function formatProjectName(name: string) {
   return name.replace(/-/g, " ");
 }
 
+/**
+ * Header bar for the project workspace.
+ *
+ * Shows the project name (loading spinner while fetching) inside a dropdown that
+ * offers navigation back to the dashboard and a light/dark/system theme picker.
+ *
+ * @param projectId - The project whose name/menu is rendered.
+ */
 export default function ProjectHeader({ projectId }: { projectId: string }) {
   const { data: project, isPending } = useGetProjectById(projectId);
   const { setTheme, theme } = useTheme();

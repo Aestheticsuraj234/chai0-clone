@@ -14,6 +14,12 @@ import { useState } from "react";
 
 type TreeItem = import("@/lib/utils").TreeItem;
 
+/**
+ * Choose an icon for a file based on its extension.
+ *
+ * @param name - The file name.
+ * @returns A colored lucide icon element matching the file type.
+ */
 function getFileIcon(name: string) {
   const ext = name.split(".").pop()?.toLowerCase();
 
@@ -36,6 +42,16 @@ function getFileIcon(name: string) {
   }
 }
 
+/**
+ * Renders a file/folder tree from a list of {@link TreeItem}s.
+ *
+ * Each top-level item is rendered as a {@link TreeNode}; selection is lifted to
+ * the parent via `onSelect`.
+ *
+ * @param data - The tree structure to render (see {@link convertFilesToTreeItems}).
+ * @param value - The currently selected file path (for highlighting).
+ * @param onSelect - Called with the file path when a file is clicked.
+ */
 export function TreeView({
   data,
   value,
@@ -66,6 +82,19 @@ export function TreeView({
   );
 }
 
+/**
+ * Recursive node in the file tree: a file (leaf button) or an expandable folder.
+ *
+ * Folders toggle open/closed on click and recursively render their children;
+ * files report their full path to `onSelect` when clicked. Indentation grows
+ * with `depth`.
+ *
+ * @param item - This node's tree item (file name or `[folder, ...children]`).
+ * @param selectedValue - The currently selected file path (for highlighting).
+ * @param onSelect - Called with the file path when a file leaf is clicked.
+ * @param parentPath - Accumulated path of ancestor folders.
+ * @param depth - Nesting depth, used to compute indentation.
+ */
 function TreeNode({
   item,
   selectedValue,

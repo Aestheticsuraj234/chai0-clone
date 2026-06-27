@@ -16,6 +16,18 @@ import MessageCard from "./message-card";
 import MessageForm from "./message-form";
 import MessageLoading from "./message-loader";
 
+/**
+ * Scrollable list of a project's messages plus the composer.
+ *
+ * Loads (and polls) messages, prefetches them on mount, auto-selects the latest
+ * assistant fragment, auto-scrolls to the newest message, and shows a loading
+ * indicator while the assistant is responding to the last user message. Handles
+ * loading, error, and empty states.
+ *
+ * @param projectId - The project whose conversation is shown.
+ * @param activeFragment - The currently selected fragment (for preview/code).
+ * @param setActiveFragment - Setter to change the active fragment.
+ */
 export default function MessageContainer({
   projectId,
   activeFragment,

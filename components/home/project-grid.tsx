@@ -7,10 +7,19 @@ import { useGetProjects } from "@/features/projects/hooks/projects";
 import { getProjectThumbnailUrl } from "@/lib/project-thumbnail";
 import { cn } from "@/lib/utils";
 
+/**
+ * Turn a kebab-case project slug into a human-friendly, spaced name.
+ *
+ * @param name - The raw project name (e.g. `"sunny-otter"`).
+ * @returns The same name with hyphens replaced by spaces.
+ */
 function formatProjectName(name: string) {
   return name.replace(/-/g, " ");
 }
 
+/**
+ * Placeholder card shown while the project list is loading.
+ */
 function ProjectCardSkeleton() {
   return (
     <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/50 py-0 shadow-sm backdrop-blur-sm">
@@ -22,6 +31,12 @@ function ProjectCardSkeleton() {
   );
 }
 
+/**
+ * Responsive grid of the signed-in user's projects.
+ *
+ * Shows skeleton cards while loading and renders nothing on error or when the
+ * user has no projects. Each card links to its project workspace.
+ */
 export function ProjectGrid() {
   const { data: projects, isLoading, isError } = useGetProjects();
 

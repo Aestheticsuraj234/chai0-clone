@@ -9,13 +9,26 @@ import { Spinner } from "@/components/ui/spinner";
 import { useCreateMessage } from "@/features/messages/hooks/messages";
 import { cn } from "@/lib/utils";
 
+/** Maximum allowed length for a single message. */
 const MAX_LENGTH = 1000;
 
+/**
+ * Auto-growing composer for sending a new message to a project.
+ *
+ * Validates that the message is non-empty and within {@link MAX_LENGTH},
+ * sends it, clears the field on success, and reports outcomes via toasts.
+ * Cmd/Ctrl+Enter submits.
+ *
+ * @param projectId - The project the message is sent to.
+ */
 export default function MessageForm({ projectId }: { projectId: string }) {
   const [content, setContent] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const { mutateAsync, isPending } = useCreateMessage(projectId);
 
+  /**
+   * Validate and send the current message, then reset the input on success.
+   */
   async function onSubmit() {
     const trimmed = content.trim();
 

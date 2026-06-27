@@ -20,17 +20,31 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 
+/**
+ * A single starter prompt suggestion.
+ *
+ * @property label - Short button label (e.g. "Todo App").
+ * @property icon - Tabler icon shown on the suggestion button.
+ * @property prompt - The full prompt text inserted when chosen.
+ */
 export type PromptTemplate = {
   label: string;
   icon: Icon;
   prompt: string;
 };
 
+/**
+ * A named group of related {@link PromptTemplate}s (e.g. "Productivity").
+ */
 export type PromptTemplateCategory = {
   name: string;
   templates: PromptTemplate[];
 };
 
+/**
+ * All starter prompt suggestions shown under the home-page composer, grouped by
+ * category.
+ */
 export const promptTemplateCategories: PromptTemplateCategory[] = [
   {
     name: "Landing pages",
@@ -179,10 +193,18 @@ export const promptTemplateCategories: PromptTemplateCategory[] = [
   },
 ];
 
+/**
+ * A flat list of every {@link PromptTemplate} across all categories.
+ */
 export const allPromptTemplates = promptTemplateCategories.flatMap(
   (category) => category.templates,
 );
 
+/**
+ * Pick a random prompt template from {@link allPromptTemplates}.
+ *
+ * @returns A randomly selected {@link PromptTemplate}.
+ */
 export function getRandomPromptTemplate() {
   return allPromptTemplates[Math.floor(Math.random() * allPromptTemplates.length)];
 }

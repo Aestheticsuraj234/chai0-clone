@@ -13,6 +13,16 @@ import { format } from "date-fns";
 import { ChevronRightIcon, Code2Icon } from "lucide-react";
 import { Chai0Mark } from "@/components/brand/chai0-logo";
 
+/**
+ * Clickable card representing a generated fragment inside an assistant message.
+ *
+ * Highlights itself when it is the active fragment and notifies the parent (with
+ * the fragment's files parsed) when clicked.
+ *
+ * @param fragment - The fragment record to display.
+ * @param isActiveFragment - Whether this fragment is currently selected.
+ * @param onFragmentClick - Called with the parsed fragment when clicked.
+ */
 function FragmentCard({
   fragment,
   isActiveFragment,
@@ -47,6 +57,11 @@ function FragmentCard({
   );
 }
 
+/**
+ * A message bubble for content authored by the user (right-aligned).
+ *
+ * @param content - The user's message text.
+ */
 function UserMessage({ content }: { content: string }) {
   return (
     <div className="flex justify-end pb-4 pl-10 pr-2">
@@ -57,6 +72,20 @@ function UserMessage({ content }: { content: string }) {
   );
 }
 
+/**
+ * A message rendered by the assistant.
+ *
+ * Shows the chai0 mark, a hover-revealed timestamp, the markdown response, and —
+ * for successful results — a {@link FragmentCard} linking to the generated app.
+ * Error-type messages are styled in red.
+ *
+ * @param content - The assistant's message text (markdown).
+ * @param fragment - Associated fragment, or `null` if none.
+ * @param createdAt - When the message was created.
+ * @param isActiveFragment - Whether this message's fragment is selected.
+ * @param onFragmentClick - Called when the fragment card is clicked.
+ * @param type - The message type (e.g. RESULT or ERROR).
+ */
 function AssistantMessage({
   content,
   fragment,
@@ -100,6 +129,18 @@ function AssistantMessage({
   );
 }
 
+/**
+ * Renders a single chat message, dispatching to the assistant or user variant
+ * based on `role`.
+ *
+ * @param content - The message text.
+ * @param role - Who authored the message (USER or ASSISTANT).
+ * @param fragment - Associated fragment, or `null`.
+ * @param createdAt - When the message was created.
+ * @param isActiveFragment - Whether this message's fragment is selected.
+ * @param onFragmentClick - Called when the fragment card is clicked.
+ * @param type - The message type (e.g. RESULT or ERROR).
+ */
 export default function MessageCard({
   content,
   role,

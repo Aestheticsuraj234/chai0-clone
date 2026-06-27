@@ -1,3 +1,10 @@
+/**
+ * Layout for the `(auth)` route group (sign-in / sign-up).
+ *
+ * Centers its children on a full-height, neutral background.
+ *
+ * @param children - The auth page content to render.
+ */
 export default function AuthLayout({
   children,
 }: Readonly<{

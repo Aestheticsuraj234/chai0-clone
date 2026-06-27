@@ -13,6 +13,15 @@ import "prismjs/components/prism-python";
 import "prismjs/components/prism-tsx";
 import "prismjs/components/prism-typescript";
 
+/**
+ * Read-only, syntax-highlighted code block.
+ *
+ * Uses Prism to highlight `code`, re-highlighting whenever the code or language
+ * changes. Long lines scroll horizontally.
+ *
+ * @param code - The source code to display.
+ * @param lang - Prism language id (defaults to `"javascript"`).
+ */
 export function CodeView({
   code,
   lang = "javascript",

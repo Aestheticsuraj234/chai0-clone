@@ -4,6 +4,12 @@ import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Chai0Logo } from "@/components/brand/chai0-logo";
 
+/**
+ * Fixed, frosted-glass top navigation bar for the home page.
+ *
+ * Shows the chai0 logo (linking home) on the left and Clerk's `UserButton` on
+ * the right. The header is click-through except for the inner nav pill.
+ */
 export function GlassNavbar() {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4">

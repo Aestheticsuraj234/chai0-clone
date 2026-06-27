@@ -21,6 +21,14 @@ import { convertFilesToTreeItems } from "@/lib/utils";
 import { CodeView } from "./code-view";
 import { TreeView } from "./tree-view";
 
+/**
+ * Breadcrumb trail for the currently selected file path.
+ *
+ * Renders each path segment when the path is short; for deep paths it collapses
+ * the middle with an ellipsis, keeping the first and last segments.
+ *
+ * @param filePath - The selected file's full path (slash-separated).
+ */
 function FileBreadcrumb({ filePath }: { filePath: string }) {
   const pathSegments = filePath.split("/");
   const maxSegments = 4;
@@ -70,6 +78,12 @@ function FileBreadcrumb({ filePath }: { filePath: string }) {
   );
 }
 
+/**
+ * Map a filename's extension to a Prism language id for highlighting.
+ *
+ * @param filename - The file name or path to inspect.
+ * @returns A Prism language id, or `"text"` when the extension is unknown.
+ */
 function getLanguageFromExtension(filename: string) {
   const extension = filename.split(".").pop()?.toLowerCase();
 
@@ -88,6 +102,15 @@ function getLanguageFromExtension(filename: string) {
   return languageMap[extension || ""] || "text";
 }
 
+/**
+ * Two-pane file explorer for a generated fragment.
+ *
+ * The left resizable pane shows a {@link TreeView} of files; the right pane
+ * shows the selected file via {@link CodeView}, with a breadcrumb and a
+ * copy-to-clipboard button. Selects the first file by default.
+ *
+ * @param files - Map of file path to file contents to browse.
+ */
 export function FileExplorer({ files }: { files: Record<string, string> }) {
   const [copied, setCopied] = useState(false);
   const [selectedFile, setSelectedFile] = useState<string | null>(() => {

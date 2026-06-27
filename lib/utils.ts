@@ -1,18 +1,41 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+/**
+ * Merge Tailwind class names safely.
+ *
+ * Combines conditional classes via `clsx`, then resolves conflicting Tailwind
+ * utilities with `tailwind-merge` (e.g. `px-2 px-4` becomes `px-4`).
+ *
+ * @param inputs - Class values (strings, arrays, objects, falsey values).
+ * @returns The merged, deduplicated class string.
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/**
+ * A node in a file tree: either a file name (string) or a folder represented as
+ * `[folderName, ...children]`.
+ */
 export type TreeItem = string | [string, ...TreeItem[]];
 
+/**
+ * Intermediate nested representation while building the tree. A `null` value
+ * marks a file (leaf); a nested object marks a folder.
+ */
 interface TreeNode {
   [key: string]: TreeNode | null;
 }
 
 /**
- * Convert a record of files to a tree structure for TreeView.
+ * Convert a flat map of file paths to a nested tree structure for the TreeView.
+ *
+ * Folders are sorted before files at each level and paths are processed in
+ * sorted order for stable output.
+ *
+ * @param files - Map of file path (e.g. `"src/Button.tsx"`) to its contents.
+ * @returns A list of {@link TreeItem}s representing the folder/file hierarchy.
  *
  * @example
  * Input: { "src/Button.tsx": "...", "README.md": "..." }
@@ -38,6 +61,10 @@ export function convertFilesToTreeItems(files: Record<string, string>): TreeItem
     current[fileName] = null;
   }
 
+  /**
+   * Recursively convert a {@link TreeNode} into ordered {@link TreeItem}s,
+   * listing folders before files.
+   */
   function buildChildren(node: TreeNode): TreeItem[] {
     const folders: TreeItem[] = [];
     const leaves: TreeItem[] = [];

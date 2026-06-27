@@ -16,6 +16,15 @@ import { FileExplorer } from "./file-explorer";
 import MessageContainer from "./message-container";
 import ProjectHeader from "./project-header";
 
+/**
+ * Top-level split-pane layout for a project workspace.
+ *
+ * Left pane: the project header and message conversation. Right pane: tabs to
+ * switch between a live "Demo" preview ({@link FragmentWeb}) and the generated
+ * "Code" ({@link FileExplorer}). Owns the selected fragment and active tab.
+ *
+ * @param projectId - The project to display.
+ */
 export function ProjectView({ projectId }: { projectId: string }) {
   const [activeFragment, setActiveFragment] = useState<ProjectFragment | null>(
     null

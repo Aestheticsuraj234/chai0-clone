@@ -19,11 +19,21 @@ import {
   promptTemplateCategories,
 } from "@/components/home/prompt-templates";
 
+/**
+ * Main prompt composer on the home page.
+ *
+ * Lets the user type (or pick a template/random idea for) a build prompt and
+ * submit it. On submit it creates a new project and navigates to its workspace,
+ * surfacing failures as toasts. Pressing Enter (without Shift) submits.
+ */
 export function PromptInput() {
   const [prompt, setPrompt] = useState("");
   const router = useRouter();
   const { mutate: createProject, isPending } = useCreateProject();
 
+  /**
+   * Validate and submit the current prompt, creating a project and routing to it.
+   */
   function handleSubmit() {
     const trimmed = prompt.trim();
     if (!trimmed || isPending) return;
@@ -38,10 +48,18 @@ export function PromptInput() {
     });
   }
 
+  /**
+   * Replace the textarea contents with a chosen template prompt.
+   *
+   * @param nextPrompt - The template prompt text to load into the input.
+   */
   function applySuggestion(nextPrompt: string) {
     setPrompt(nextPrompt);
   }
 
+  /**
+   * Load a random template prompt into the input ("Random idea").
+   */
   function shuffleSuggestions() {
     setPrompt(getRandomPromptTemplate().prompt);
   }

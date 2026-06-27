@@ -1,10 +1,23 @@
 import { cn } from "@/lib/utils";
 
+/**
+ * Props for {@link Chai0Logo}.
+ *
+ * @property className - Extra classes applied to the wrapper.
+ * @property showWordmark - Whether to render the "chai0" text next to the mark.
+ */
 type Chai0LogoProps = {
   className?: string;
   showWordmark?: boolean;
 };
 
+/**
+ * The standalone chai0 glyph (SVG mark) without the wordmark.
+ *
+ * Inherits color via `currentColor` so it adapts to the surrounding text color.
+ *
+ * @param className - Extra classes applied to the `<svg>` element.
+ */
 function Chai0Mark({ className }: { className?: string }) {
   return (
     <svg
@@ -31,6 +44,11 @@ function Chai0Mark({ className }: { className?: string }) {
   );
 }
 
+/**
+ * The chai0 brand logo: the glyph mark plus an optional "chai0" wordmark.
+ *
+ * @param props - See {@link Chai0LogoProps}.
+ */
 export function Chai0Logo({
   className,
   showWordmark = true,

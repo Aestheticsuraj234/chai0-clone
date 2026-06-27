@@ -3,6 +3,14 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 
+/**
+ * Ensure a database `User` record exists for the currently signed-in Clerk user.
+ *
+ * Reads the active Clerk session, derives a best-effort email and display name,
+ * and upserts the corresponding row keyed by `clerkId`. Safe to call on every
+ * authenticated request: it creates the user on first login and keeps profile
+ * fields in sync on subsequent visits. No-ops when there is no signed-in user.
+ */
 export async function onboardUser() {
   const { userId } = await auth();
   if (!userId) return;
@@ -39,6 +47,13 @@ export async function onboardUser() {
   });
 }
 
+/**
+ * Fetch the database `User` record for the currently signed-in Clerk user.
+ *
+ * @returns The user's core fields (`id`, `email`, `name`, `imageUrl`,
+ *   `clerkId`), or `null` if no one is signed in, the user has not been
+ *   onboarded yet, or an error occurs.
+ */
 export const getCurrentUser = async () => {
     try {
       const user = await currentUser();

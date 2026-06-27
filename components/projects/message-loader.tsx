@@ -14,6 +14,11 @@ const loadingMessages = [
   "Almost there...",
 ];
 
+/**
+ * Cycles through playful status phrases with a shimmer animation.
+ *
+ * Advances to the next message every 2 seconds, looping back to the start.
+ */
 function ShimmerMessages() {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
@@ -32,6 +37,12 @@ function ShimmerMessages() {
   );
 }
 
+/**
+ * Placeholder assistant message shown while a response is being generated.
+ *
+ * Mirrors the assistant message layout (chai0 mark + content) but renders
+ * rotating {@link ShimmerMessages} instead of real content.
+ */
 export default function MessageLoading() {
   return (
     <div className="group flex flex-col px-2 pb-4">

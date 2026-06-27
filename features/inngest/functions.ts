@@ -13,11 +13,25 @@ import { z } from "zod";
 import { inngest } from "./client";
 import { lastAssistantTextMessageContent } from "./utils";
 
+/**
+ * Shared state passed between agents inside the coding network.
+ *
+ * @property summary - The agent's final `<task_summary>` once the build is done.
+ * @property files   - Map of file path to file contents written to the sandbox.
+ */
 interface CodeAgentState {
   summary: string;
   files: Record<string, string>;
 }
 
+/**
+ * Minimal demo Inngest function that acknowledges an `app/task.created` event.
+ *
+ * It records the task as processed, waits briefly, and returns a completion
+ * message. Primarily a placeholder/example of the Inngest wiring.
+ *
+ * @event app/task.created - Carries `{ id }` of the task to process.
+ */
 export const processTask = inngest.createFunction(
   { id: "process-task", triggers: { event: "app/task.created" } },
   async ({ event, step }) => {
@@ -31,6 +45,21 @@ export const processTask = inngest.createFunction(
   }
 );
 
+/**
+ * Core background job that turns a user prompt into a working web app.
+ *
+ * High-level flow:
+ * 1. Spin up an E2B sandbox and load prior project messages as agent context.
+ * 2. Run a coding agent (Gemini) that can use the terminal, create/update files,
+ *    and read files inside the sandbox until it emits a `<task_summary>`.
+ * 3. Generate a short fragment title and a user-facing response message.
+ * 4. Persist the result (or an error message) to the database, linking a
+ *    Fragment that points at the live sandbox URL and generated files.
+ *
+ * @event code-agent/run - Carries `{ value, projectId }` where `value` is the
+ *   user's prompt and `projectId` is the project to attach messages to.
+ * @returns The sandbox URL, generated title, files map, and agent summary.
+ */
 export const codeAgentFunction = inngest.createFunction(
   { id: "code-agent", triggers: { event: "code-agent/run" } },
   async ({ event, step }) => {
@@ -242,6 +271,12 @@ export const codeAgentFunction = inngest.createFunction(
       { step }
     );
 
+    /**
+     * Normalize the title-generator output into a plain string.
+     *
+     * Falls back to "Untitled" when the model did not return text, and joins
+     * multi-part content into a single string when needed.
+     */
     const generateFragmentTitle = () => {
       if (fragmentTitleOutput[0]?.type !== "text") {
         return "Untitled";
@@ -256,6 +291,12 @@ export const codeAgentFunction = inngest.createFunction(
       return fragmentTitleOutput[0].content;
     };
 
+    /**
+     * Normalize the response-generator output into a plain string.
+     *
+     * Falls back to "Here you go" when the model did not return text, and joins
+     * multi-part content into a single string when needed.
+     */
     const generateResponse = () => {
       if (responseOutput[0]?.type !== "text") {
         return "Here you go";

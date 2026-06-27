@@ -1,5 +1,14 @@
 import { cn } from "@/lib/utils";
 
+/**
+ * Decorative, non-interactive background for the home page.
+ *
+ * Layers a grid pattern, soft radial glow blobs, and top/bottom fade gradients
+ * that adapt to light/dark mode. Purely visual (`aria-hidden`,
+ * `pointer-events-none`).
+ *
+ * @param className - Extra classes for the absolutely-positioned wrapper.
+ */
 export function HomeBackground({ className }: { className?: string }) {
   return (
     <div
